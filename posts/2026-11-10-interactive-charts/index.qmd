@@ -1,0 +1,94 @@
+---
+title: "Interactive charts"
+description: "Charts that the reader can hover over, zoom and pan, made in Python with Altair."
+author: "Tolborg Group"
+date: 2026-11-10
+categories: [guide, python, interactive]
+---
+
+A blog post is a web page, so its figures do not have to be static. This post
+shows how to make an interactive chart with Altair. The chart runs entirely in
+the reader's browser: nothing has to be running once the blog is published.
+
+[Altair](https://altair-viz.github.io) is a Python plotting library that
+produces interactive web charts. A chart is built by connecting columns of a
+data frame to *encodings*, such as the x-axis, the y-axis and the colour.
+
+Below are the Lennard-Jones potentials of the noble gases (approximate
+parameters). Hover over a curve to read off values, click on the legend to
+highlight one gas, and scroll or drag to zoom and pan; double-click resets
+the view.
+
+```{python}
+#| code-fold: true
+import altair as alt
+import numpy as np
+import pandas as pd
+
+# Approximate Lennard-Jones parameters: epsilon in meV, sigma in Ångström.
+gases = {"Ne": (3.1, 2.75), "Ar": (10.3, 3.40), "Kr": (14.1, 3.65), "Xe": (19.7, 3.98)}
+
+r = np.linspace(2.5, 8.0, 300)
+df = pd.concat(
+    pd.DataFrame({
+        "gas": gas,
+        "r": r,
+        "V": 4 * eps * ((sigma / r) ** 12 - (sigma / r) ** 6),
+    })
+    for gas, (eps, sigma) in gases.items()
+)
+
+highlight = alt.selection_point(fields=["gas"], bind="legend")
+hover = alt.selection_point(fields=["r"], nearest=True, on="pointerover", empty=False)
+
+base = alt.Chart(df).encode(
+    x=alt.X("r:Q", title="Distance (Å)"),
+    y=alt.Y("V:Q", title="Energy (meV)", scale=alt.Scale(domain=[-22, 10])),
+    color=alt.Color("gas:N", title="Gas"),
+)
+lines = base.mark_line(clip=True).encode(
+    opacity=alt.condition(highlight, alt.value(1), alt.value(0.15)),
+).add_params(highlight)
+points = base.mark_point(clip=True, filled=True, size=50).encode(
+    opacity=alt.condition(hover, alt.value(1), alt.value(0)),
+    tooltip=[
+        # format="" works around a bug in Vega-Lite 6.4 that shows "undefined"
+        # with nearest=True; it can be removed once Altair uses Vega-Lite 6.5.
+        alt.Tooltip("gas:N", title="Gas", format=""),
+        alt.Tooltip("r:Q", title="r (Å)", format=".2f"),
+        alt.Tooltip("V:Q", title="V (meV)", format=".2f"),
+    ],
+).add_params(hover)
+
+(lines + points).properties(width=600, height=350).interactive()
+```
+
+The data frame is embedded in the page, so a chart with many points makes the
+page heavy. As a rule of thumb, keep it below a few thousand rows per chart,
+e.g. by subsampling, and use Matplotlib when there is more data than that.
+
+## Other options
+
+Altair is one of several ways to make a post interactive. The ones below go
+further, from other plotting libraries to small apps that run in the browser.
+
+- **Plotly** is the main alternative to Altair for interactive charts from
+  Python, and works in a post in the same way
+  ([documentation](https://plotly.com/python/),
+  [in Quarto](https://quarto.org/docs/interactive/widgets/jupyter.html)).
+- **Shinylive** runs [Shiny](https://shiny.posit.co/py/) apps, written in
+  Python, in the reader's browser with Pyodide
+  ([documentation](https://shiny.posit.co/py/get-started/shinylive.html),
+  [Quarto extension](https://github.com/quarto-ext/shinylive)).
+- **marimo** is a reactive Python notebook whose cells can be embedded in a
+  post and run in the browser
+  ([documentation](https://docs.marimo.io/),
+  [Quarto extension](https://github.com/marimo-team/quarto-marimo)).
+- **D3.js** is the JavaScript library behind many interactive web graphics. It
+  gives full control, but takes more work
+  ([documentation](https://d3js.org/),
+  [in Quarto](https://quarto.org/docs/interactive/ojs/libraries.html)).
+- **Observable JS** is a reactive form of JavaScript, built into Quarto, for
+  charts that respond to sliders and other inputs
+  ([documentation](https://observablehq.com/documentation/),
+  [in Quarto](https://quarto.org/docs/interactive/ojs/)).

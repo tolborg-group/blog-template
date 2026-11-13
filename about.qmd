@@ -1,0 +1,10 @@
+---
+title: "About"
+---
+
+This blog is written by members of the [Tolborg Group](https://github.com/tolborg-group)
+at Aalborg University.
+
+Replace this page with a description of what the blog is for: a research log
+for a project, short write-ups of results, or notes that are useful to others
+in the group.

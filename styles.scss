@@ -1,0 +1,40 @@
+// Small polish on top of Cosmo and _brand.yml.
+
+/*-- scss:defaults --*/
+
+$navbar-bg: $body-bg;
+$navbar-fg: $body-color;
+$navbar-hl: $primary;
+$footer-bg: $body-bg;
+$border-radius: 8px;
+
+/*-- scss:rules --*/
+
+$blog-border: mix($body-color, $body-bg, 14%);
+$blog-subtle: mix($body-color, $body-bg, 5%);
+
+h1,
+.title {
+  letter-spacing: -0.02em;
+}
+
+.navbar {
+  border-bottom: 1px solid $blog-border;
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+div.sourceCode {
+  background-color: $blog-subtle;
+  border: 1px solid $blog-border;
+  border-radius: $border-radius;
+}
+
+// Centre Altair charts. Quarto's fig-align only applies to images, not to the
+// div that vega-embed renders into.
+.cell-output-display > div[id^="altair-viz"] {
+  display: flex;
+  justify-content: center;
+}

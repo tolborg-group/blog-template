@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Template Blog"
+  description: "Notes, results and ideas from the Tolborg Group."
+  favicon: assets/logo.svg
+  # Set this to the published address, e.g. https://tolborg-group.github.io/<repo>,
+  # so that the RSS feed and social cards get absolute links.
+  site-url: https://tolborg-group.github.io/blog-template
+  navbar:
+    logo: assets/logo.svg
+    logo-alt: ""
+    left:
+      - href: index.qmd
+        text: Posts
+      - href: about.qmd
+        text: About
+    right:
+      - icon: rss
+        href: index.xml
+        aria-label: RSS feed
+      - icon: github
+        href: https://github.com/tolborg-group/blog-template
+        aria-label: GitHub repository
+
+format:
+  html:
+    # Colours, fonts and logo are set in _brand.yml, the rest in styles.scss.
+    # styles.scss is listed before brand so that it can read the brand colours.
+    theme: [cosmo, styles.scss, brand]
+    toc: true
+    code-copy: true
+    code-overflow: wrap
+    link-external-newwindow: true
+
+execute:
+  # Re-run a post's code only when that post's source changes. The results are
+  # stored in _freeze/, which is committed, so CI and collaborators do not have to
+  # re-run old posts. See the "Python in a post" post for details.
+  freeze: auto

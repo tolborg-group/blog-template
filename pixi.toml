@@ -1,0 +1,45 @@
+[workspace]
+name = "blog-template"
+version = "0.1.0"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64"]
+
+[dependencies]
+quarto     = ">=1.11"
+python     = "3.12.*"
+# Needed by Quarto to run the Python code in posts.
+ipykernel  = "*"
+nbformat   = "*"
+nbclient   = "*"
+pyyaml     = "*"
+# Used by the example posts. Add what your posts need with `pixi add <package>`.
+numpy      = "*"
+pandas     = "*"
+jinja2     = "*"   # pandas table styling
+matplotlib = "*"
+altair     = "*"
+
+# ── Blog ──────────────────────────────────────────────────────────────────────
+[tasks.preview]
+cmd = "quarto preview"
+description = "Open a live preview that updates on every save"
+
+[tasks.render]
+cmd = "quarto render"
+description = "Render the whole blog into _site/"
+
+# ── Claude Code: group skills (github.com/tolborg-group/group-skills) ─────────
+# Keep each cmd on one line: pixi's shell rejects a line starting with || or &&.
+[tasks.check-claude]
+cmd = "claude --version > /dev/null || (echo \"Claude Code not found. Install it and run 'claude' once to log in.\" && exit 1)"
+description = "Check that Claude Code is installed"
+
+[tasks.setup-claude]
+depends-on = ["check-claude"]
+cmd = "claude plugin marketplace add tolborg-group/group-skills && claude plugin install git@tolborg-group"
+description = "Install the group's Claude Code plugins (run once)"
+
+[tasks.sync]
+depends-on = ["check-claude"]
+cmd = 'claude "/git:sync"'
+description = "Start Claude Code to commit, pull and push this repo"

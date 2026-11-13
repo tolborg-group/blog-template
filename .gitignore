@@ -1,0 +1,12 @@
+# Quarto output (published by CI) and caches. _freeze/ is NOT ignored: commit it.
+/_site/
+/.quarto/
+**/*.quarto_ipynb*
+
+# Pixi
+.pixi/*
+!.pixi/config.toml
+
+.DS_Store
+
+**/*.quarto_ipynb

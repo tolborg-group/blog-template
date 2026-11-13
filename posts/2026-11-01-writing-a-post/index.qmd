@@ -1,0 +1,125 @@
+---
+title: "Writing a post"
+description: "How a post is put together, and the Markdown and Quarto features that are used most often."
+author: "Tolborg Group"
+date: 2026-11-01
+categories: [guide, markdown]
+bibliography: references.bib
+---
+
+Every post is a folder in `posts/` holding an `index.qmd` file, together with
+anything the post uses: data, images, a bibliography. The folder name starts
+with the date, such that the posts sort in the file browser as they do on the
+blog. A new post is started by making a folder such as
+`posts/2026-11-20-phonon-results/`, adding an `index.qmd` file to it, and
+copying in the front matter shown below.
+
+## The front matter
+
+The block between the `---` lines at the top of the file is the *front
+matter*. It is written in YAML and holds everything about the post that is not
+its text. The front matter of this post is
+
+```yaml
+---
+title: "Writing a post"
+description: "How a post is put together, ..."
+author: "Tolborg Group"
+date: 2026-11-01
+categories: [guide, markdown]
+bibliography: references.bib
+---
+```
+
+The title, description, date and categories appear in the list of posts on the
+front page, where the categories also work as filters. Adding `draft: true`
+keeps a post off the published blog while it is being written; drafts are
+still shown by `pixi run preview`.
+
+## Markdown
+
+The text itself is Markdown, so **bold**, *italics*, `code`,
+[links](https://quarto.org) and lists work as usual:
+
+- Lists are written with `-`,
+- numbered lists with `1.`,
+- and nesting with an indent.
+
+Code blocks are fenced with three backticks and the name of the language, which
+gives syntax highlighting:
+
+```python
+def lennard_jones(r, epsilon=1.0, sigma=1.0):
+    return 4 * epsilon * ((sigma / r) ** 12 - (sigma / r) ** 6)
+```
+
+Code blocks like this one are only displayed. Code that is *run* when the post
+is rendered is written with braces, ```` ```{python} ````, which is the topic of
+[the next post](../2026-11-05-python-figures/index.qmd).
+
+## Equations
+
+Equations are written in LaTeX, inline between single dollar signs, such as
+$E = mc^2$, or displayed between double dollar signs. A label after the closing
+dollars makes the equation numbered and referable:
+
+$$
+V(r) = 4\varepsilon \left[ \left(\frac{\sigma}{r}\right)^{12}
+       - \left(\frac{\sigma}{r}\right)^{6} \right]
+$$ {#eq-lj}
+
+@eq-lj is the Lennard-Jones potential. The same `@` syntax refers to figures
+(`@fig-…`), tables (`@tbl-…`) and sections (`@sec-…`).
+
+## Citations
+
+With a BibTeX file named in the front matter, `[@kohn1965]` cites an entry
+[@kohn1965], `@hohenberg1964` cites it in the text, as in
+@hohenberg1964, and the reference list is added at the end of the post. The
+BibTeX entries are the same as for LaTeX, so they can be copied from a paper's
+`references.bib`.
+
+## Callouts
+
+::: {.callout-note}
+Callouts draw attention to a remark. There are five kinds: `note`, `tip`,
+`important`, `warning` and `caution`.
+:::
+
+::: {.callout-tip collapse="true"}
+## A collapsed callout with a title
+
+Its content is only shown when the title is clicked. Useful for details that
+most readers will skip.
+:::
+
+## Tabs and margin notes
+
+::: {.panel-tabset}
+## Pixi
+
+```bash
+pixi add numpy
+```
+
+## pip
+
+```bash
+pip install numpy
+```
+:::
+
+Short remarks can go in the margin instead of the
+text.[This is a margin note, written as `[...]{.aside}` or with a `.column-margin` div.]{.aside}
+Footnotes work too.^[And are collected at the end of the post.]
+
+## Images
+
+An image in the post folder is included with
+
+```markdown
+![A caption](figure.png){#fig-name width=70%}
+```
+
+where the label and width are optional. Figures made by Python code in the
+post do not need this, as shown in the next post.

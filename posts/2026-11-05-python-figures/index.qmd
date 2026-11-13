@@ -1,0 +1,128 @@
+---
+title: "Python in a post"
+description: "Running Python when the post is rendered: figures, tables and numbers in the text that come straight from the data."
+author: "Tolborg Group"
+date: 2026-11-05
+categories: [guide, python]
+---
+
+A code block written as ```` ```{python} ```` is *run* when the post is
+rendered, and whatever it prints or plots ends up in the post. This means that
+the figures and numbers in a post are made from the data, rather than copied
+in by hand, and that they are updated when the data changes.
+
+The example here is a $k$-point convergence test of a total energy, stored as
+`kpoint-convergence.csv` next to this post.
+
+## Reading the data
+
+```{python}
+import pandas as pd
+
+df = pd.read_csv("kpoint-convergence.csv")
+df.head()
+```
+
+The code runs in the post's folder, so files next to `index.qmd` are read
+by their name. The last expression of a block is displayed, as in a Jupyter
+notebook, and a data frame is shown as a table.
+
+## Options for a code block
+
+Lines at the top of a block starting with `#|` are *cell options*. They set
+how the block and its output are shown, e.g. a label and caption that turn the
+output into a numbered table:
+
+```{python}
+#| label: tbl-convergence
+#| tbl-cap: "Total energy relative to the finest mesh."
+#| echo: false
+E_ref = df["energy_ev"].iloc[-1]
+table = df.assign(error_mev=1000 * (df["energy_ev"] - E_ref))
+table.columns = ["k-points per side", "Energy (eV)", "Error (meV)"]
+table.style.hide(axis="index").format(precision=3)
+```
+
+`echo: false` hides the code and keeps the output, which is what most posts
+want for most blocks. Other useful options are `code-fold: true`, which hides
+the code behind a "Code" toggle, as in the block below, and `output: false`,
+which runs the code without showing anything.
+
+## Figures
+
+A plot made with Matplotlib becomes a figure, and with a `fig-` label it can be
+referred to as @fig-convergence.
+
+```{python}
+#| label: fig-convergence
+#| fig-cap: "Convergence of the total energy with the number of $k$-points per side. The dashed line is the value for the finest mesh."
+#| code-fold: true
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(6, 3.5))
+ax.plot(
+    df["k_per_side"], df["energy_ev"], "o-",
+    color="#0f766e", markerfacecolor="white", markeredgewidth=1.5,
+)
+ax.axhline(E_ref, color="gray", linewidth=0.8, linestyle="--")
+ax.set_xlabel("$k$-points per side")
+ax.set_ylabel("Total energy (eV)")
+ax.set_xticks(df["k_per_side"])
+ax.spines[["top", "right"]].set_visible(False)
+plt.show()
+```
+
+## Numbers in the text
+
+A value computed in a block can be written straight into a sentence with
+inline code that starts with `python` in braces, as shown below the following
+block:
+
+```{python}
+#| echo: false
+tolerance_mev = 5
+converged = table[table["Error (meV)"].abs() < tolerance_mev]
+k_converged = int(converged["k-points per side"].iloc[0])
+```
+
+The energy is converged to within `{python} tolerance_mev` meV from
+`{python} k_converged` $k$-points per side, as seen in @tbl-convergence.
+
+Written in the source, that sentence is
+
+```markdown
+The energy is converged to within `{{python}} tolerance_mev` meV
+from `{{python}} k_converged` $k$-points per side,
+as seen in @tbl-convergence.
+```
+
+so changing the tolerance, or the data, changes the text with it.
+
+## When is the code run?
+
+The blog is set up with `freeze: auto` in `_quarto.yml`. A post's code is run
+when the post is rendered for the first time and again only when its
+`index.qmd` changes. The results are stored in the `_freeze/` folder, which is
+committed together with the post. This has two advantages:
+
+- Old posts keep working even if the code or data they used has moved on.
+- A post can use data that is too large for the repository, or computations
+  that only run on the cluster: as long as `_freeze/` is committed, GitHub
+  only needs the stored results to publish the blog.
+
+::: {.callout-important}
+Remember to commit `_freeze/` together with the post. If the stored results are
+missing, the post is run again when the blog is published, which fails if the
+data is not in the repository.
+:::
+
+## Packages
+
+The code runs in the Pixi environment of the blog. A package that a post needs
+is added with
+
+```bash
+pixi add scipy
+```
+
+and the updated `pixi.toml` and `pixi.lock` are committed with the post.

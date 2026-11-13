@@ -1,0 +1,36 @@
+# Shared look with the group handbook (light mode only).
+logo:
+  medium: assets/logo.svg
+
+color:
+  palette:
+    teal-dark: "#0f766e"
+    slate-800: "#1e293b"
+    white: "#ffffff"
+  foreground: slate-800
+  background: white
+  primary: teal-dark
+
+typography:
+  fonts:
+    # Bunny Fonts serves the same families as Google Fonts without tracking.
+    - family: Inter
+      source: bunny
+      weight: [400, 500, 600, 700]
+      style: [normal, italic]
+    - family: JetBrains Mono
+      source: bunny
+      weight: [400, 600]
+  base:
+    family: Inter
+    size: 17px
+    line-height: 1.65
+  headings:
+    family: Inter
+    weight: 600
+    line-height: 1.25
+  monospace:
+    family: JetBrains Mono
+    size: 0.875em
+  link:
+    color: primary
